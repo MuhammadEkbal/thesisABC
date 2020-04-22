@@ -1,59 +1,54 @@
-agent System = (^ex_coffee,in_coffee,ex_tea,in_tea,ex_switch,in_switch,ex_talk,in_talk_vm,in_talk_shop) ( VM(ex_coffee,in_coffee,ex_tea,in_tea,ex_talk,in_talk_vm) | Cus(ex_coffee,ex_tea) | IdleShop(ex_switch) | ActiveShop(ex_switch,ex_talk,in_talk_shop) )
+agent System = (^ex_coffee,done_ex_cofee,in_coffee,done_in_cofee,ex_tea,done_ex_tea,in_tea,done_ex_tea,done_in_tea,ex_switch,in_switch,ex_talk,in_talk_vm,in_talk_shop,done_ex_talk,done_in_talk_vm,done_in_talk_shop) ( VM(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk_vm,done_ex_talk,done_in_talk_vm) | Cus(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea) | IdleShop(ex_switch) | ActiveShop(ex_switch,ex_talk,in_talk_shop,done_ex_talk,done_in_talk_shop) )
+
 agent IdleShop(ex_switch) = (^in_switch) (IdleShop_OZ_PI_Init_Null(in_switch) | IdleShop_PI(ex_switch,in_switch))
-agent IdleShop_PI(ex_switch,in_switch) = ex_switch(ex_talk,in_talk).'in_switch<in_talk>.ActiveShop_PI(ex_switch,in_switch,ex_talk,in_talk)
+agent IdleShop_PI(ex_switch,in_switch) = ex_switch(ex_talk,in_talk,done_ex_talk,done_in_talk).'in_switch<in_talk,done_in_talk>.ActiveShop_PI(ex_switch,in_switch,ex_talk,in_talk,done_ex_talk,done_in_talk)
 
 agent IdleShop_OZ_PI_Init_Null(in_switch) = (^self,transferableOperation,vmId,message) (IdleShop_OZ_PI(self,in_switch,transferableOperation,vmId,message) | One(self) | Nullref(transferableOperation) | Nill(vmId) | Nill(message))
-agent IdleShop_OZ_PI(self,in_switch,transferableOperation,vmId,message) = in_switch(talk_new).((^n,c) ('transferableOperation<n,c>.'c<talk_new>.ActiveShop_OZ_PI(self,in_switch,transferableOperation,talk_new,vmId,message)))
+agent IdleShop_OZ_PI(self,in_switch,transferableOperation,vmId,message) = in_switch(talk_new,done_in_talk).((^n,c) ('transferableOperation<n,c>.'c<talk_new>.ActiveShop_OZ_PI(self,in_switch,transferableOperation,talk_new,done_in_talk,vmId,message)))
+
+agent ActiveShop(ex_switch,ex_talk,in_talk,done_ex_talk,done_in_talk) = (^in_switch) (ActiveShop_OZ_PI_Init_Talk(in_switch,in_talk,done_in_talk) | ActiveShop_PI(ex_switch,in_switch,ex_talk,in_talk,done_ex_talk,done_in_talk))
+
+agent ActiveShop_PI(ex_switch,in_switch,ex_talk,in_talk,done_ex_talk,done_in_talk) = in_switch(in_talk_new).'ex_switch<ex_talk,in_talk,done_ex_talk,done_in_talk>.IdleShop_PI(ex_switch,in_switch) + ex_talk(r_c,m_c).'in_talk<r_c,m_c>.done_in_talk.'done_ex_talk.ActiveShop_PI(ex_switch,in_switch,ex_talk,in_talk,done_ex_talk,done_in_talk)
+
+agent ActiveShop_OZ_PI_Init_Talk(in_switch,in_talk,done_in_talk) = (^self,transferableOperation,vmId,message) (ActiveShop_OZ_PI(self,in_switch,transferableOperation,in_talk,done_in_talk,vmId,message) | Two(self) | Ref(transferableOperation,in_talk) | Nill(vmId) | Nill(message))
+
+agent ActiveShop_OZ_PI(self,in_switch,transferableOperation,in_talk,done_in_talk,vmId,message) = 'in_switch<in_talk>.( ((^n,c) ('transferableOperation<n,c>.'n.IdleShop_OZ_PI(self,in_switch,transferableOperation,vmId,message))) | KillAndSetNilIfNotNill(vmId)  | KillAndSetNilIfNotNill(message))  \
+														   + in_talk(vmId_new,m_new).(^done_ref,done_m) ( (done_ref.done_m.'done_in_talk.ActiveShop_OZ_PI(self,in_switch,transferableOperation,in_talk,done_in_talk,vmId,message)) | KillThenCopyValueThenKillTemp(vmId_new,vmId,done_ref) | KillThenCopyValueThenKillTemp(m_new,message,done_m))
 
 
+agent VM(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk) = (VM_OZ_PI_Init(in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk) | VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk))
 
 
-
-agent ActiveShop(ex_switch,ex_talk,in_talk) = (^in_switch) (ActiveShop_OZ_PI_Init_Talk(in_switch,in_talk) | ActiveShop_PI(ex_switch,in_switch,ex_talk,in_talk))
-
-agent ActiveShop_PI(ex_switch,in_switch,ex_talk,in_talk) = in_switch(in_talk_new).'ex_switch<ex_talk,in_talk>.IdleShop_PI(ex_switch,in_switch) + ex_talk(r_c,m_c).'in_talk<r_c,m_c>.in_talk.'ex_talk.ActiveShop_PI(ex_switch,in_switch,ex_talk,in_talk)
-
-
-agent ActiveShop_OZ_PI_Init_Talk(in_switch,in_talk) = (^self,transferableOperation,vmId,message) (ActiveShop_OZ_PI(self,in_switch,transferableOperation,in_talk,vmId,message) | Two(self) | Ref(transferableOperation,in_talk) | Nill(vmId) | Nill(message))
-
-agent ActiveShop_OZ_PI(self,in_switch,transferableOperation,in_talk,vmId,message) = 'in_switch<in_talk>.( ((^n,c) ('transferableOperation<n,c>.'n.IdleShop_OZ_PI(self,in_switch,transferableOperation,vmId,message))) | KillAndSetNilIfNotNill(vmId)  | KillAndSetNilIfNotNill(message))  \
-														   + in_talk(vmId_new,m_new).(^done_ref,done_m) ( (done_ref.done_m.'in_talk.ActiveShop_OZ_PI(self,in_switch,transferableOperation,in_talk,vmId,message)) | KillThenCopyValueThenKillTemp(vmId_new,vmId,done_ref) | KillThenCopyValueThenKillTemp(m_new,message,done_m))
+agent VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk) = ex_coffee.'in_coffee.done_in_cofee.'done_ex_cofee.VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk) \
+																+  ex_tea.'in_tea.done_in_tea.'done_ex_tea.VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk) \
+																+  in_talk(r_c,m_c).'ex_talk<r_c,m_c>.done_ex_talk.'done_in_talk.VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk)
 
 
-														   
-														   
-agent VM(ex_coffee,in_coffee,ex_tea,in_tea,ex_talk,in_talk_vm) = (VM_OZ_PI_Init(in_coffee,in_tea,in_talk_vm) | VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,ex_talk,in_talk_vm))
+agent VM_OZ_PI_Init(in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk) = (^self,cv,tv,message) (VM_OZ_PI(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message) | Zero(self) | Three(cv) | Three(tv) | One(message))
 
 
-agent VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,ex_talk,in_talk) = ex_coffee.'in_coffee.in_coffee.'ex_coffee.VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,ex_talk,in_talk) \
-																+  ex_tea.'in_tea.in_tea.'ex_tea.VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,ex_talk,in_talk) \
-																+  in_talk(r_c,m_c).'ex_talk<r_c,m_c>.ex_talk.VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,ex_talk,in_talk)
-
-
-
-agent VM_OZ_PI_Init(in_coffee,in_tea,in_talk_vm) = (^self,cv,tv,message) (VM_OZ_PI(self,in_coffee,in_tea,in_talk_vm,cv,tv,message) | Zero(self) | Three(cv) | Three(tv) | One(message))
-
-agent VM_OZ_PI(self,in_coffee,in_tea,in_talk,cv,tv,message) = in_coffee.(^res_t,res_f) (VM_Condition_coffee(self,in_coffee,in_tea,in_talk,cv,tv,message,res_t,res_f) | VM_Condition_IF_Else_coffee(self,in_coffee,in_tea,in_talk,cv,tv,message,res_t,res_f)) \
-											+ in_tea.(^res_t,res_f) (VM_Condition_tea(self,in_coffee,in_tea,in_talk,cv,tv,message,res_t,res_f) | VM_Condition_IF_Else_tea(self,in_coffee,in_tea,in_talk,cv,tv,message,res_t,res_f)) \
-											+ (^m_c,m_done,r_c,r_done) ( (m_done.r_done.'in_talk<r_c,m_c>.VM_OZ_PI(self,in_coffee,in_tea,in_talk,cv,tv,message)) | Copy(message,m_c,m_done) | Copy(self,r_c,r_done))
-
-
+agent VM_OZ_PI(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message) = in_coffee.(^res_t,res_f) (VM_Condition_coffee(self,in_coffee,in_tea,in_talk,cv,tv,message,res_t,res_f) | VM_Condition_IF_Else_coffee(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message,res_t,res_f)) \
+											+ in_tea.(^res_t,res_f) (VM_Condition_tea(self,in_coffee,in_tea,in_talk,cv,tv,message,res_t,res_f) | VM_Condition_IF_Else_tea(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message,res_t,res_f)) \
+											+ (^m_c,m_done,r_c,r_done) ( (m_done.r_done.'in_talk<r_c,m_c>.done_in_talk.VM_OZ_PI(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message)) | Copy(message,m_c,m_done) | Copy(self,r_c,r_done))
 
 agent VM_Condition_coffee(self,in_coffee,in_tea,in_talk,cv,tv,message,res_t,res_f) = (^b,g,e,l) (Zero(b) | Compare(cv,b,g,e,l) | CleanAndTF(g,e,l,res_t,res_f,b))
 
-agent VM_Condition_IF_Else_coffee(self,in_coffee,in_tea,in_talk,cv,tv,message,res_t,res_f) = res_t.(VM_State_Transition_coffee(self,in_coffee,in_tea,in_talk,cv,tv,message)) + res_f.VM_PleaseFillMe
+agent VM_Condition_IF_Else_coffee(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message,res_t,res_f) = res_t.(VM_State_Transition_coffee(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message)) + res_f.VM_PleaseFillMe
 
-agent VM_State_Transition_coffee(self,in_coffee,in_tea,in_talk,cv,tv,message) = (^sub_done, b,c,done) ((One(b) | Sub(cv,b,c,done) | ClearThenCopy(cv,b,c,done,sub_done)) | (sub_done.'in_coffee.VM_OZ_PI(self,in_coffee,in_tea,in_talk,cv,tv,message)) )
+
+agent VM_State_Transition_coffee(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message) = (^sub_done, b,c,done) ((One(b) | Sub(cv,b,c,done) | ClearThenCopy(cv,b,c,done,sub_done)) | (sub_done.'done_in_cofee.VM_OZ_PI(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message)) )
 
 
 agent VM_Condition_tea(self,in_coffee,in_tea,in_talk,cv,tv,message,res_t,res_f) = (^b,g,e,l) (Zero(b) | Compare(tv,b,g,e,l) | CleanAndTF(g,e,l,res_t,res_f,b))
 
-agent VM_Condition_IF_Else_tea(self,in_coffee,in_tea,in_talk,cv,tv,message,res_t,res_f) = res_t.(VM_State_Transition_tea(self,in_coffee,in_tea,in_talk,cv,tv,message)) + res_f.VM_PleaseFillMe
 
-agent VM_State_Transition_tea(self,in_coffee,in_tea,in_talk,cv,tv,message) = (^sub_done, b,c,done) ((One(b) | Sub(tv,b,c,done) | ClearThenCopy(tv,b,c,done,sub_done)) | (sub_done.'in_tea.VM_OZ_PI(self,in_coffee,in_tea,in_talk,cv,tv,message)) )
-
+agent VM_Condition_IF_Else_tea(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message,res_t,res_f) = res_t.(VM_State_Transition_tea(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message)) + res_f.VM_PleaseFillMe
 
 
+agent VM_State_Transition_tea(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message) = (^sub_done, b,c,done) ((One(b) | Sub(tv,b,c,done) | ClearThenCopy(tv,b,c,done,sub_done)) | (sub_done.'done_in_tea.VM_OZ_PI(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message)) )
+
+
+agent Cus(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea) = 'ex_coffee.done_ex_cofee.Cus(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea) + 'ex_tea.done_ex_tea.Cus(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea)
 
 
 agent KillAndSetNilIfNotNill(a) = (^tt,ff) (CheckNil(a,tt,ff) | KillIFTrue(a,tt,ff))
@@ -65,9 +60,6 @@ agent CheckNil(a,tt,ff) = (^x,y) ('a<x,y>.PassNumber(a,tt,ff,x,y) + a.'tt)
 
 agent PassNumber(a,tt,ff,x,y) = x.PassNumber_1(a,tt,ff,x,y) + y.PassNumber_1(a,tt,ff,x,y)
 agent PassNumber_1(a,tt,ff,x,y) = x.'ff + y.'ff
-
-agent Cus(coffee,tea) = 'coffee.coffee.Cus(coffee,tea) + 'tea.tea.Cus(coffee,tea)
-
 
 
 
