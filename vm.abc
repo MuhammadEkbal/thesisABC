@@ -1,4 +1,4 @@
-agent System = (^ex_coffee,done_ex_cofee,in_coffee,done_in_cofee,ex_tea,done_ex_tea,in_tea,done_ex_tea,done_in_tea,ex_switch,in_switch,ex_talk,in_talk_vm,in_talk_shop,done_ex_talk,done_in_talk_vm,done_in_talk_shop) ( VM(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk_vm,done_ex_talk,done_in_talk_vm) | Cus(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea) | IdleShop(ex_switch) | ActiveShop(ex_switch,ex_talk,in_talk_shop,done_ex_talk,done_in_talk_shop) )
+agent System = (^ex_coffee,done_ex_cofee,in_coffee,done_in_cofee,ex_tea,done_ex_tea,in_tea,done_ex_tea,done_in_tea,ex_switch,in_switch,ex_talk,in_talk_vm,in_talk_shop,done_ex_talk,done_in_talk_vm,done_in_talk_shop) ( VM(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea,ex_talk,done_ex_talk) | Cus(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea) | IdleShop(ex_switch) | ActiveShop(ex_switch,ex_talk,done_ex_talk) )
 
 agent IdleShop(ex_switch) = (^in_switch) (IdleShop_OZ_PI_Init_Null(in_switch) | IdleShop_PI(ex_switch,in_switch))
 agent IdleShop_PI(ex_switch,in_switch) = ex_switch(ex_talk,in_talk,done_ex_talk,done_in_talk).'in_switch<in_talk,done_in_talk>.ActiveShop_PI(ex_switch,in_switch,ex_talk,in_talk,done_ex_talk,done_in_talk)
@@ -6,7 +6,7 @@ agent IdleShop_PI(ex_switch,in_switch) = ex_switch(ex_talk,in_talk,done_ex_talk,
 agent IdleShop_OZ_PI_Init_Null(in_switch) = (^self,transferableOperation,vmId,message) (IdleShop_OZ_PI(self,in_switch,transferableOperation,vmId,message) | One(self) | Nullref(transferableOperation) | Nill(vmId) | Nill(message))
 agent IdleShop_OZ_PI(self,in_switch,transferableOperation,vmId,message) = in_switch(talk_new,done_in_talk).((^n,c) ('transferableOperation<n,c>.'c<talk_new>.ActiveShop_OZ_PI(self,in_switch,transferableOperation,talk_new,done_in_talk,vmId,message)))
 
-agent ActiveShop(ex_switch,ex_talk,in_talk,done_ex_talk,done_in_talk) = (^in_switch) (ActiveShop_OZ_PI_Init_Talk(in_switch,in_talk,done_in_talk) | ActiveShop_PI(ex_switch,in_switch,ex_talk,in_talk,done_ex_talk,done_in_talk))
+agent ActiveShop(ex_switch,ex_talk,done_ex_talk) = (^in_switch,in_talk_shop,done_in_talk_shop) (ActiveShop_OZ_PI_Init_Talk(in_switch,in_talk_shop,done_in_talk_shop) | ActiveShop_PI(ex_switch,in_switch,ex_talk,in_talk_shop,done_ex_talk,done_in_talk_shop))
 
 agent ActiveShop_PI(ex_switch,in_switch,ex_talk,in_talk,done_ex_talk,done_in_talk) = in_switch(in_talk_new).'ex_switch<ex_talk,in_talk,done_ex_talk,done_in_talk>.IdleShop_PI(ex_switch,in_switch) + ex_talk(r_c,m_c).'in_talk<r_c,m_c>.done_in_talk.'done_ex_talk.ActiveShop_PI(ex_switch,in_switch,ex_talk,in_talk,done_ex_talk,done_in_talk)
 
@@ -16,7 +16,7 @@ agent ActiveShop_OZ_PI(self,in_switch,transferableOperation,in_talk,done_in_talk
 														   + in_talk(vmId_new,m_new).(^done_ref,done_m) ( (done_ref.done_m.'done_in_talk.ActiveShop_OZ_PI(self,in_switch,transferableOperation,in_talk,done_in_talk,vmId,message)) | KillThenCopyValueThenKillTemp(vmId_new,vmId,done_ref) | KillThenCopyValueThenKillTemp(m_new,message,done_m))
 
 
-agent VM(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk) = (VM_OZ_PI_Init(in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk) | VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk))
+agent VM(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea,ex_talk,done_ex_talk) = (^in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk)(VM_OZ_PI_Init(in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk) | VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk))
 
 
 agent VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk) = ex_coffee.'in_coffee.done_in_cofee.'done_ex_cofee.VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk) \
