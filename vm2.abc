@@ -1,0 +1,14 @@
+
+agent Cus(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea) = 'ex_coffee.done_ex_cofee.Cus(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea) + 'ex_tea.done_ex_tea.Cus(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea)
+
+agent Cus2(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea) = 'ex_tea.done_ex_tea.Cus2(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea)
+
+
+
+
+lt Cus2 Cus
+lt Cus Cus2
+
+
+
+

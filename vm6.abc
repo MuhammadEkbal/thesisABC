@@ -1,0 +1,6 @@
+agent A(a,b) = a.A a b +  b.A a b
+agent B(a,b) = a.A a b
+
+
+lt B(x,y) A(x,y)
+lt A(x,y) B(x,y)

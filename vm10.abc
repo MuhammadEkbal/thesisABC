@@ -1,0 +1,13 @@
+agent VM_PI(coffee,tea,talk) = \
+coffee.VM_PI(coffee,tea,talk) \
++ tea.VM_PI(coffee,tea,talk) \
++ 'talk.VM_PI(coffee,tea,talk)
+
+				
+agent VM_Half_PI(coffee,talk) = (^tea) (VM_PI(coffee,tea,talk))
+
+// check if VM_Half_PI strongly simulates VM_PI
+lt VM_PI(coffee,tea,talk) VM_Half_PI(coffee,talk)
+
+// check if VM_PI strongly simulates VM_Half_PI
+lt VM_Half_PI(coffee,talk) VM_PI(coffee,tea,talk) 

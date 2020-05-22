@@ -1,0 +1,203 @@
+agent VM(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea,ex_talk,done_ex_talk) = (^in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk)(VM_OZ_PI_Init(in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk) | VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk))
+
+
+agent VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk) = ex_coffee.'in_coffee.done_in_cofee.'done_ex_cofee.VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk) \
+																+  ex_tea.'in_tea.done_in_tea.'done_ex_tea.VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk) \
+																+  in_talk(r_c,m_c).'ex_talk<r_c,m_c>.done_ex_talk.'done_in_talk.VM_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk)
+
+
+agent VM_OZ_PI_Init(in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk) = (^self,cv,tv,message) (VM_OZ_PI(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message) | Zero(self) | Three(cv) | Three(tv) | One(message))
+
+
+agent VM_OZ_PI(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message) = in_coffee.(^res_t,res_f) (VM_Condition_coffee(self,in_coffee,in_tea,in_talk,cv,tv,message,res_t,res_f) | VM_Condition_IF_Else_coffee(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message,res_t,res_f)) \
+											+ in_tea.(^res_t,res_f) (VM_Condition_tea(self,in_coffee,in_tea,in_talk,cv,tv,message,res_t,res_f) | VM_Condition_IF_Else_tea(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message,res_t,res_f)) \
+											+ (^m_c,m_done,r_c,r_done) ( (m_done.r_done.'in_talk<r_c,m_c>.done_in_talk.VM_OZ_PI(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message)) | Copy(message,m_c,m_done) | Copy(self,r_c,r_done))
+
+agent VM_Condition_coffee(self,in_coffee,in_tea,in_talk,cv,tv,message,res_t,res_f) = (^b,g,e,l) (Zero(b) | Compare(cv,b,g,e,l) | CleanAndTF(g,e,l,res_t,res_f,b))
+
+agent VM_Condition_IF_Else_coffee(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message,res_t,res_f) = res_t.(VM_State_Transition_coffee(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message)) + res_f.VM_PleaseFillMe
+
+
+agent VM_State_Transition_coffee(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message) = (^sub_done, b,c,done) ((One(b) | Sub(cv,b,c,done) | ClearThenCopy(cv,b,c,done,sub_done)) | (sub_done.'done_in_cofee.VM_OZ_PI(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message)) )
+
+
+agent VM_Condition_tea(self,in_coffee,in_tea,in_talk,cv,tv,message,res_t,res_f) = (^b,g,e,l) (Zero(b) | Compare(tv,b,g,e,l) | CleanAndTF(g,e,l,res_t,res_f,b))
+
+
+agent VM_Condition_IF_Else_tea(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message,res_t,res_f) = res_t.(VM_State_Transition_tea(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message)) + res_f.VM_PleaseFillMe
+
+
+agent VM_State_Transition_tea(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message) = (^sub_done, b,c,done) ((One(b) | Sub(tv,b,c,done) | ClearThenCopy(tv,b,c,done,sub_done)) | (sub_done.'done_in_tea.VM_OZ_PI(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message)) )
+
+
+
+agent VM_Half(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea,ex_talk,done_ex_talk) = (^in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk)(VM_Half_OZ_PI_Init(in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk) | VM_Half_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk))
+
+
+agent VM_Half_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk) = ex_coffee.'in_coffee.done_in_cofee.'done_ex_cofee.VM_Half_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk) \
+																+  in_talk(r_c,m_c).'ex_talk<r_c,m_c>.done_ex_talk.'done_in_talk.VM_Half_PI(ex_coffee,in_coffee,ex_tea,in_tea,done_ex_cofee,done_ex_tea,done_in_cofee,done_in_tea,ex_talk,in_talk,done_ex_talk,done_in_talk)
+
+
+agent VM_Half_OZ_PI_Init(in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk) = (^self,cv,tv,message) (VM_Half_OZ_PI(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message) | Zero(self) | Three(cv) | Three(tv) | One(message))
+
+
+agent VM_Half_OZ_PI(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message) = in_coffee.(^res_t,res_f) (VM_Half_Condition_coffee(self,in_coffee,in_tea,in_talk,cv,tv,message,res_t,res_f) | VM_Half_Condition_IF_Else_coffee(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message,res_t,res_f)) \
+											+ (^m_c,m_done,r_c,r_done) ( (m_done.r_done.'in_talk<r_c,m_c>.done_in_talk.VM_Half_OZ_PI(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message)) | Copy(message,m_c,m_done) | Copy(self,r_c,r_done))
+
+agent VM_Half_Condition_coffee(self,in_coffee,in_tea,in_talk,cv,tv,message,res_t,res_f) = (^b,g,e,l) (Zero(b) | Compare(cv,b,g,e,l) | CleanAndTF(g,e,l,res_t,res_f,b))
+
+agent VM_Half_Condition_IF_Else_coffee(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message,res_t,res_f) = res_t.(VM_Half_State_Transition_coffee(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message)) + res_f.VM_Half_PleaseFillMe
+
+
+agent VM_Half_State_Transition_coffee(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message) = (^sub_done, b,c,done) ((One(b) | Sub(cv,b,c,done) | ClearThenCopy(cv,b,c,done,sub_done)) | (sub_done.'done_in_cofee.VM_Half_OZ_PI(self,in_coffee,in_tea,done_in_cofee,done_in_tea,in_talk,done_in_talk,cv,tv,message)) )
+
+
+
+
+
+
+
+
+
+agent KillAndSetNilIfNotNill(a) = (^tt,ff) (CheckNil(a,tt,ff) | KillIFTrue(a,tt,ff))
+agent KillIFTrue(a,tt,ff) = tt.0 + ff.SetNill(a)
+agent SetNill(a) = 'a.Nill(a)
+
+
+agent CheckNil(a,tt,ff) = (^x,y) ('a<x,y>.PassNumber(a,tt,ff,x,y) + a.'tt)
+
+agent PassNumber(a,tt,ff,x,y) = x.PassNumber_1(a,tt,ff,x,y) + y.PassNumber_1(a,tt,ff,x,y)
+agent PassNumber_1(a,tt,ff,x,y) = x.'ff + y.'ff
+
+
+
+agent CleanAndTF(g,e,l,res_t,res_f,b) = g.(Send(res_t) | Kill(b)) + e.(Send(res_f) | Kill(b)) + l.(Send(res_f) | Kill(b))
+agent Kill(b) = 'b
+
+agent ClearThenCopy(v,b,c,done,sub_done) = done.'v.(^done) (Copy(c,v,done) | ClearTemp(done,b,c,sub_done))
+agent ClearTemp(done,b,c,sub_done) = done.'b.'c.Send(sub_done)
+
+
+
+agent KillThenCopyValueThenKillTemp(v,chan,done1) = 'chan.(^done) (Copy(v,chan,done) | ClearTempValue(v,done,done1))
+agent ClearTempValue(v,done,done1) = done.(Send(v) | Send(done1) )
+
+
+agent Copy(a,b,done) = (^tt,ff) ('a<tt,ff>.(ff.Copy_X_0(a,b,done,tt,ff) + tt.Copy_X_1(a,b,done,tt,ff)))
+agent Copy_X_0(a,b,done,tt,ff) = ff.(Zero(b) | Send(done)) + tt.(Two(b) | Send(done))
+agent Copy_X_1(a,b,done,tt,ff) = tt.(Three(b) | Send(done))+ ff.(One(b) | Send(done))
+
+
+agent GetValue(ref,o) = (^n,c) ( 'ref<n,c>.c(v).'o<v> )
+
+
+
+
+agent Compare(a,b,g,e,l) = (^ta,fa,tb,fb,l_t,l_f,e_t,e_f,g_t,g_f) ('a<ta,fa>.'b<tb,fb>.(^tb1,fb1,tb2,fb2,o_xor_t,o_xor_f,o_xor_1t,o_xor_1f,o_xor_2t,o_xor_2f,o_nand_1_t,o_nand_1_f,o_nand_1_1t,o_nand_1_1f,o_nand_1_2t,o_nand_1_2f)( \
+Repeate(tb,fb,tb1,fb1,tb2,fb2) \
+| XOR(ta,fa,tb1,fb1,o_xor_t,o_xor_f) \ 
+| Repeate(o_xor_t,o_xor_f,o_xor_1t,o_xor_1f,o_xor_2t,o_xor_2f) \
+| NAND(tb2,fb2,o_xor_2t,o_xor_2f,o_nand_1_t,o_nand_1_f) \
+| Repeate(o_nand_1_t,o_nand_1_f,o_nand_1_1t,o_nand_1_1f,o_nand_1_2t,o_nand_1_2f) \
+| Compare_3(a,b,l_t,l_f,e_t,e_f,g_t,g_f,ta,fa,tb,fb,o_nand_1_1t,o_nand_1_1f,o_nand_1_2t,o_nand_1_2f,o_xor_1t,o_xor_1f,g,e,l) \
+))
+
+
+agent Compare_3(a,b,l_t,l_f,e_t,e_f,g_t,g_f,ta,fa,tb,fb,o_nand_1_1t,o_nand_1_1f,o_nand_1_2t,o_nand_1_2f,o_xor_1t,o_xor_1f,g,e,l) = \
+o_nand_1_1t.Compare_4(a,b,l_t,l_f,e_t,e_f,g_t,g_f,ta,fa,tb,fb,o_nand_1_2t,o_nand_1_2f,o_xor_1t,o_xor_1f,g,e,l) \
++ o_nand_1_1f.Compare_4(a,b,l_t,l_f,e_t,e_f,g_t,g_f,ta,fa,tb,fb,o_nand_1_2t,o_nand_1_2f,o_xor_1t,o_xor_1f,g,e,l)
+
+
+agent Compare_4(a,b,l_t,l_f,e_t,e_f,g_t,g_f,ta,fa,tb,fb,o_nand_1_2t,o_nand_1_2f,o_xor_1t,o_xor_1f,g,e,l) = (^tb1,fb1,tb2,fb2,o_xnor_t,o_xnor_f,o_xnor_1t,o_xnor_1f,o_xnor_2t,o_xnor_2f,o_nor_1_t,o_nor_1_f,o_nand_2_t,o_nand_2_f,o_nand_2_1t,o_nand_2_1f,o_nand_2_2t,o_nand_2_2f,o_nor_2_t,o_nor_2_f,o_xor_2_t,o_xor_2_f,o_nor_2_1t,o_nor_2_1f,o_nor_2_2t,o_nor_2_2f,o_xor_2_1t,o_xor_2_1f,o_xor_2_2t,o_xor_2_2f,o_nor_3_t,o_nor_3_f,e2t,e2f,l2t,l2f)(\
+Repeate(tb,fb,tb1,fb1,tb2,fb2) \
+| XNOR(ta,fa,tb1,fb1,o_xnor_t,o_xnor_f) \
+| Repeate(o_xnor_t,o_xnor_f,o_xnor_1t,o_xnor_1f,o_xnor_2t,o_xnor_2f) \ 
+| NOR(tb2,fb2,o_xnor_1t,o_xnor_1f,o_nor_1_t,o_nor_1_f) \
+| NAND(o_xnor_2t,o_xnor_2f,o_nand_1_2t,o_nand_1_2f,o_nand_2_t,o_nand_2_f) \
+| Repeate(o_nand_2_t,o_nand_2_f,o_nand_2_1t,o_nand_2_1f,o_nand_2_2t,o_nand_2_2f) \
+| NOR(o_nand_2_1t,o_nand_2_1f,o_xor_1t,o_xor_1f,o_nor_2_t,o_nor_2_f) \
+| XOR(o_nor_1_t,o_nor_1_f,o_nand_2_2t,o_nand_2_2f,o_xor_2_t,o_xor_2_f) \
+| Repeate(o_nor_2_t,o_nor_2_f,e_t,e_f,e2t,e2f) \
+| Repeate(o_xor_2_t,o_xor_2_f,l_t,l_f,l2t,l2f) \
+| NOR(e2t,e2f,l2t,l2f,g_t,g_f) \
+| Compare_5(l_t,l_f,e_t,e_f,g_t,g_f,g,e,l) \
+)
+agent Compare_5(l_t,l_f,e_t,e_f,g_t,g_f,g,e,l) = g_t.Compare_6(g,e_f,l_f) + e_t.Compare_6(e,l_f,g_f)+ l_t.Compare_6(l,e_f,g_f)
+
+agent Compare_6(a,b,c) = b.c.'a
+
+
+
+(* the trick is to invert t2,f2 places to mimic the Inverter *)
+agent Sub(a,b,c) = (^t1,f1,t2,f2) ('a<t1,f1>.'b<t2,f2>.(^cin_t,cin_f,cout_t,cout_f,s2_t,s2_f,cout3_t,cout3_f,s3_t,s3_f) ( \
+FullAdderWait(t1,f1,f2,t2,cin_t,cin_f,cout_t,cout_f,s2_t,s2_f) \
+| 'cin_t \
+| FullAdderWait(t1,f1,f2,t2,cout_t,cout_f,cout3_t,cout3_f,s3_t,s3_f) \
+| Result_S(s2_t,s2_f,s3_t,s3_f,cout3_t,cout3_f,c) \
+))
+
+
+agent Result_S(s0_t,s0_f,s1_t,s1_f,c_t,c_f,res) = \
+s0_f.(s1_f.(c_t.Zero(res) + c_f.ErrNegResult ) + s1_t.(c_t.Two(res) + c_f.ErrNegResult )) \
++ s0_t.(s1_f.(c_t.One(res) + c_f.ErrNegResult ) + s1_t.(c_t.Three(res) + c_f.ErrNegResult))
+
+
+agent ErrNegResult = 0
+
+
+agent FullAdderWait(t1,f1,t2,f2,cin_t,cin_f,cout3_t,cout3_f,s3_t,s3_f) = \
+cin_t.('cin_t | FullAdder(t1,f1,t2,f2,cin_t,cin_f,cout3_t,cout3_f,s3_t,s3_f)) \
++ cin_f.('cin_f | FullAdder(t1,f1,t2,f2,cin_t,cin_f,cout3_t,cout3_f,s3_t,s3_f))
+
+
+agent FullAdder(t1,f1,t2,f2,cin_t,cin_f,cout_t,cout_f,s2_t,s2_f) = \
+(^t1a,f1a,t1b,f1b,t2a,f2a,t2b,f2b,c1_t,c1_f,s1_t,s1_f,c2_t,c2_f,s1_ta,s1_fa,s1_tb,s1_fb,cin_ta,cin_fa,cin_tb,cin_fb) \
+( \
+HalfAdder(t1,f1,t1a,f1a,t1b,f1b,t2,f2,t2a,f2a,t2b,f2b,c1_t,c1_f,s1_t,s1_f) \
+| HalfAdder(s1_t,s1_f,s1_ta,s1_fa,s1_tb,s1_fb,cin_t,cin_f,cin_ta,cin_fa,cin_tb,cin_fb,c2_t,c2_f,s2_t,s2_f) \
+| OR(c1_t,c1_f,c2_t,c2_f,cout_t,cout_f) \
+)
+
+
+agent HalfAdder(t1,f1,t1a,f1a,t1b,f1b,t2,f2,t2a,f2a,t2b,f2b,c_t,c_f,s_t,s_f) = (Repeate(t1,f1,t1a,f1a,t1b,f1b) | Repeate(t2,f2,t2a,f2a,t2b,f2b) | AND(t1a,f1a,t2a,f2a,c_t,c_f) | XOR(t1b,f1b,t2b,f2b,s_t,s_f))
+
+
+
+
+agent AND(t1,f1,t2,f2,o_t,o_f) = f1.(f2.'o_f + t2.'o_f) + t1.(f2.'o_f + t2.'o_t)
+agent NAND(t1,f1,t2,f2,o_t,o_f) = f1.(f2.'o_t + t2.'o_t) + t1.(f2.'o_t + t2.'o_f)
+
+agent OR(t1,f1,t2,f2,o_t,o_f) = f1.(f2.'o_f + t2.'o_t) + t1.(f2.'o_t + t2.'o_t)
+agent NOR(t1,f1,t2,f2,o_t,o_f) = f1.(f2.'o_t + t2.'o_f) + t1.(f2.'o_f + t2.'o_f)
+
+agent XOR(t1,f1,t2,f2,o_t,o_f) = f1.(f2.'o_f + t2.'o_t) + t1.(f2.'o_t + t2.'o_f)
+agent XNOR(t1,f1,t2,f2,o_t,o_f) = f1.(f2.'o_t + t2.'o_f) + t1.(f2.'o_f + t2.'o_t)
+
+
+
+
+agent Nill(a) = a.0 + 'a.Nill(a)
+
+agent Nullref(r) = r(n,c).('n.Nullref(r) + c(m).Ref(r,m) + n.Nullref(r))
+agent Ref(r,v) = r(n,c).('c<v>.Ref(r,v) + c(m).Ref(r,m) + 'n.Nullref(r))
+agent Nil(k) = k(n,c).'n.Nil(k)
+agent Node(k,v,l) = k(n,c).'c<v,l>.Node(k,v,l)
+
+agent Zero(a) = a(tt,ff).'ff.'ff.Zero(a) + a.0
+agent One(a) = a(tt,ff).'tt.'ff.One(a) + a.0
+agent Two(a) = a(tt,ff).'ff.'tt.Two(a) + a.0
+agent Three(a) = a(tt,ff).'tt.'tt.Three(a) + a.0
+
+agent Send(a) = 'a
+agent Neg(tt,ff) = tt.'ff + ff.'tt
+agent Repeate(tt,ff,ta,fa,tb,fb) = tt.('ta | 'tb) + ff.('fa | 'fb)
+
+
+
+
+
+
+
+
+lt VM(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea,ex_talk,done_ex_talk) VM_Half(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea,ex_talk,done_ex_talk)
+lt VM_Half(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea,ex_talk,done_ex_talk) VM(ex_coffee,ex_tea,done_ex_cofee,done_ex_tea,ex_talk,done_ex_talk)
