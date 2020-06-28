@@ -1,0 +1,6 @@
+
+agent P(a,b) = 'b.P(a,b)
+agent Q(a,b) = 'a.Q(a,b) + 'b.Q(a,b)
+
+lt P(a,b) Q(a,b)
+lt Q(a,b) P(a,b)

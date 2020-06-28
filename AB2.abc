@@ -1,0 +1,6 @@
+
+agent P(a) = (^c) ('a<c>)
+agent Q(a) = (^k) ('a<k>)
+
+
+lt P(a) Q(a)

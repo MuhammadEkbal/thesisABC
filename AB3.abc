@@ -1,0 +1,12 @@
+
+agent P(a) = (^c) ('a<c>.P1(a,c) + 'a<c>.P2(a,c))
+agent Q(a) = (^c) ('a<c>.Q1(a,c))
+
+
+agent P1(a,c) = 'a
+agent P2(a,c) = 'c
+agent Q1(a,c) = 'a + 'c
+
+
+lt P(a) Q(a)
+lt Q(a) P(a)
